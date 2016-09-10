@@ -52,6 +52,49 @@ namespace atpccl.Bezier
             set { SetValue(TitleProperty, value); }
         }
 
+        public Point StartPoint
+        {
+            get { return (Point)GetValue(StartPointProperty); }
+            set { SetValue(StartPointProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty StartPointProperty =
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+
+        public Point EndPoint
+        {
+            get { return (Point)GetValue(EndPointProperty); }
+            set { SetValue(EndPointProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty EndPointProperty =
+            DependencyProperty.Register("EndPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+
+        public Point StartBezierPoint
+        {
+            get { return (Point)GetValue(StartBezierPointProperty); }
+            set { SetValue(StartBezierPointProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for StartBezierPoint.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty StartBezierPointProperty =
+            DependencyProperty.Register("StartBezierPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+
+        public Point EndBezierPoint
+        {
+            get { return (Point)GetValue(EndBezierPointProperty); }
+            set { SetValue(EndBezierPointProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for EndBezierPoint.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty EndBezierPointProperty =
+            DependencyProperty.Register("EndBezierPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+
+
+
+
         // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register("Title", typeof(string), typeof(BezierControl), new PropertyMetadata("Bezier Control"));

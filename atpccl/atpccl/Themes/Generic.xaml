@@ -21,11 +21,10 @@
 
                         <Border DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="1">
                             <Canvas ClipToBounds="True">
-                                <local.Bezier:BezierFigure x:Name="figure"
-                    StartPoint="40,80"
-                    StartBezierPoint="100,300"
-                    EndBezierPoint="400,80"
-                    EndPoint="450,300"/>
+                                <local.Bezier:BezierFigure StartPoint="{Binding StartPoint, RelativeSource={RelativeSource TemplatedParent}}"
+                                                           EndPoint="{Binding EndPoint, RelativeSource={RelativeSource TemplatedParent}}"
+                                                           StartBezierPoint="{Binding StartBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"
+                                                           EndBezierPoint="{Binding EndBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"/>
                             </Canvas>
                         </Border>
 
