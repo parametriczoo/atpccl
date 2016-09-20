@@ -51,12 +51,11 @@
                                     <PathGeometry>
                                         <PathGeometry.Figures>
                                             <PathFigureCollection>
-                                                <PathFigure StartPoint="{Binding Path=StartPoint, RelativeSource={RelativeSource TemplatedParent}}">
+                                                <PathFigure StartPoint="{Binding Path=Points[0],Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                                     <PathFigure.Segments>
                                                         <PathSegmentCollection>
-                                                            <BezierSegment Point1="{Binding Path=StartBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                           Point2="{Binding Path=EndBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                           Point3="{Binding Path=EndPoint, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                            <PolyLineSegment Points="{Binding Path=Points,Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" >
+                                                            </PolyLineSegment>
                                                         </PathSegmentCollection>
                                                     </PathFigure.Segments>
                                                 </PathFigure>

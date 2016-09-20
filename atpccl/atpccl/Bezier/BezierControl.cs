@@ -60,7 +60,7 @@ namespace atpccl.Bezier
 
         // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point(10, 250)));
 
         public Point EndPoint
         {
@@ -70,7 +70,7 @@ namespace atpccl.Bezier
 
         // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+            DependencyProperty.Register("EndPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point(400, 250)));
 
         public Point StartBezierPoint
         {
@@ -80,7 +80,7 @@ namespace atpccl.Bezier
 
         // Using a DependencyProperty as the backing store for StartBezierPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartBezierPointProperty =
-            DependencyProperty.Register("StartBezierPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+            DependencyProperty.Register("StartBezierPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point(80, 10)));
 
         public Point EndBezierPoint
         {
@@ -90,7 +90,7 @@ namespace atpccl.Bezier
 
         // Using a DependencyProperty as the backing store for EndBezierPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndBezierPointProperty =
-            DependencyProperty.Register("EndBezierPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point()));
+            DependencyProperty.Register("EndBezierPoint", typeof(Point), typeof(BezierControl), new FrameworkPropertyMetadata(new Point(320, 10)));
 
 
 
@@ -104,5 +104,6 @@ namespace atpccl.Bezier
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BezierControl), new FrameworkPropertyMetadata(typeof(BezierControl)));
         }
+        
     }
 }

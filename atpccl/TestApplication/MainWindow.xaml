@@ -9,6 +9,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <atpcc.Bezier:BezierControl Title="Bezier" StartPoint="10,250" EndPoint="400,250" StartBezierPoint="100,10" EndBezierPoint="300,10" /> 
+        <atpcc.Bezier:BezierControl Title="Bezier" /> 
     </Grid>
 </Window>
