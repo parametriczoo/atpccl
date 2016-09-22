@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,6 +48,8 @@ namespace atpccl.Bezier
     /// </summary>
     public class BezierFigure : Control
     {
+        Canvas _canvas;
+        public PointCollection ControlPoints { get; set; }
         public PointCollection Points
         {
             get { return (PointCollection)GetValue(PointsProperty); }
@@ -56,18 +60,6 @@ namespace atpccl.Bezier
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register("Points", typeof(PointCollection), typeof(BezierFigure));
 
-
-        public Point[] ControlPoints
-        {
-            get { return (Point[])GetValue(ControlPointsProperty); }
-            set { SetValue(ControlPointsProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Points.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ControlPointsProperty =
-            DependencyProperty.Register("ControlPoints", typeof(Point[]), typeof(BezierFigure));
-
-
         public Point StartPoint
         {
             get { return (Point)GetValue(StartPointProperty); }
@@ -77,13 +69,6 @@ namespace atpccl.Bezier
         // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartPointProperty =
             DependencyProperty.Register("StartPoint", typeof(Point), typeof(BezierFigure), new FrameworkPropertyMetadata(new Point(), new PropertyChangedCallback(OnPointChanged)));
-
-        private static void OnPointChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var figure = d as BezierFigure;
-
-            figure.GetBezierApproximation();
-        }
 
         public Point EndPoint
         {
@@ -126,17 +111,51 @@ namespace atpccl.Bezier
         public static readonly DependencyProperty PolyLineProperty =
             DependencyProperty.Register("PolyLine", typeof(PolyLineSegment), typeof(BezierFigure));
 
-
-        public BezierFigure()
+        private static void OnPointChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ControlPoints = new[] {
+            var figure = d as BezierFigure;
+            figure.UpdateControlPoints();
+        }
+        public void UpdateControlPoints()
+        {
+            ControlPoints = new PointCollection {
                 StartPoint,
                 StartBezierPoint,
                 EndBezierPoint,
                 EndPoint
             };
+            GetBezierApproximation();
+        }
+        public BezierFigure()
+        {
             Points = new PointCollection();
         }
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            if (_canvas == null)
+            {
+                _canvas = (Canvas)GetTemplateChild("PART_canvas");
+                _canvas.PreviewMouseLeftButtonDown += _canvas_MouseUp;
+            }
+        }
+
+        private void _canvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                var point = e.GetPosition(_canvas);
+                ControlPoints = new PointCollection {
+                        StartPoint,
+                        StartBezierPoint,
+                        EndBezierPoint,
+                        EndPoint,
+                        point
+                    };
+                GetBezierApproximation();
+            }
+        }
+
         static BezierFigure()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(BezierFigure), new FrameworkPropertyMetadata(typeof(BezierFigure)));
@@ -144,28 +163,24 @@ namespace atpccl.Bezier
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
+            UpdateControlPoints();
             GetBezierApproximation();
         }
+
         void GetBezierApproximation()
         {
-            ControlPoints = new[] {
-                StartPoint,
-                StartBezierPoint,
-                EndBezierPoint,
-                EndPoint
-            };
             int outputSegmentCount = 256;
             Point[] points = new Point[outputSegmentCount + 1];
             for (int i = 0; i <= outputSegmentCount; i++)
             {
                 double t = (double)i / outputSegmentCount;
-                points[i] = GetBezierPoint(t, ControlPoints, 0, ControlPoints.Length);
+                points[i] = GetBezierPoint(t, ControlPoints, 0, ControlPoints.Count);
             }
             PolyLine = new PolyLineSegment(points, true);
             Points = PolyLine.Points;
         }
 
-        Point GetBezierPoint(double t, Point[] controlPoints, int index, int count)
+        Point GetBezierPoint(double t, PointCollection controlPoints, int index, int count)
         {
             if (count == 1)
                 return controlPoints[index];

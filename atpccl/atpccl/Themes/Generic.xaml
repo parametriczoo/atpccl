@@ -20,12 +20,12 @@
                         </StackPanel>
 
                         <Border DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="1">
-                            <Canvas ClipToBounds="True">
+                            
                                 <local.Bezier:BezierFigure StartPoint="{Binding StartPoint, RelativeSource={RelativeSource TemplatedParent}}"
                                                            EndPoint="{Binding EndPoint, RelativeSource={RelativeSource TemplatedParent}}"
                                                            StartBezierPoint="{Binding StartBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"
                                                            EndBezierPoint="{Binding EndBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"/>
-                            </Canvas>
+                            
                         </Border>
 
                     </DockPanel>
@@ -43,7 +43,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
 
-                        <Canvas Background="AliceBlue">
+                        <Canvas Background="AliceBlue" Name="PART_canvas">
 
                             <!-- render the BezierSegment itself -->
                             <Path Stroke="Red" StrokeThickness="2" >
