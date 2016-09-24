@@ -43,7 +43,7 @@
                         <Canvas Background="AliceBlue" Name="PART_canvas">
 
                             <!-- render the BezierSegment itself -->
-                            <Path Stroke="Red" StrokeThickness="2" >
+                            <Path Stroke="Red" StrokeThickness="2" Name="PART_Path" >
                                 <Path.Data>
                                     <PathGeometry>
                                         <PathGeometry.Figures>
