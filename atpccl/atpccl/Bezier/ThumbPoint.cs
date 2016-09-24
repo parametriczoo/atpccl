@@ -72,7 +72,10 @@ namespace atpccl.Bezier
         {
             Point = point;
         }
-
+        public ThumbPoint(double x, double y) : this()
+        {
+            Point = new Point(x, y);
+        }
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
         {
             this.Point = new Point(this.Point.X + e.HorizontalChange, this.Point.Y + e.VerticalChange);

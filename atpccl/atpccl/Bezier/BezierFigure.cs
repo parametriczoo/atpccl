@@ -49,8 +49,8 @@ namespace atpccl.Bezier
     public class BezierFigure : Control
     {
         Canvas _canvas;
-        public List<ThumbPoint> ControlPoints { get; set; }
-        List<ThumbPoint> _extraControlPoints { get; set; }
+        List<ThumbPoint> ControlPoints { get; set; }
+        List<ThumbPoint> OrderedControlPoints { get; set; }
         public PointCollection Points
         {
             get { return (PointCollection)GetValue(PointsProperty); }
@@ -60,47 +60,6 @@ namespace atpccl.Bezier
         // Using a DependencyProperty as the backing store for Points.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register("Points", typeof(PointCollection), typeof(BezierFigure));
-
-        public Point StartPoint
-        {
-            get { return (Point)GetValue(StartPointProperty); }
-            set { SetValue(StartPointProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(BezierFigure), new FrameworkPropertyMetadata(new Point(), new PropertyChangedCallback(OnPointChanged)));
-
-        public Point EndPoint
-        {
-            get { return (Point)GetValue(EndPointProperty); }
-            set { SetValue(EndPointProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(BezierFigure), new FrameworkPropertyMetadata(new Point(), new PropertyChangedCallback(OnPointChanged)));
-
-        public Point StartBezierPoint
-        {
-            get { return (Point)GetValue(StartBezierPointProperty); }
-            set { SetValue(StartBezierPointProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for StartBezierPoint.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty StartBezierPointProperty =
-            DependencyProperty.Register("StartBezierPoint", typeof(Point), typeof(BezierFigure), new FrameworkPropertyMetadata(new Point(), new PropertyChangedCallback(OnPointChanged)));
-
-        public Point EndBezierPoint
-        {
-            get { return (Point)GetValue(EndBezierPointProperty); }
-            set { SetValue(EndBezierPointProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for EndBezierPoint.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty EndBezierPointProperty =
-            DependencyProperty.Register("EndBezierPoint", typeof(Point), typeof(BezierFigure), new FrameworkPropertyMetadata(new Point(), new PropertyChangedCallback(OnPointChanged)));
-
 
         public PolyLineSegment PolyLine
         {
@@ -112,25 +71,16 @@ namespace atpccl.Bezier
         public static readonly DependencyProperty PolyLineProperty =
             DependencyProperty.Register("PolyLine", typeof(PolyLineSegment), typeof(BezierFigure));
 
-        private static void OnPointChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var figure = d as BezierFigure;
-            figure.UpdateControlPoints();
-        }
-        public void UpdateControlPoints()
-        {
-            ControlPoints = new List<ThumbPoint> {
-                new ThumbPoint(StartPoint),
-                new ThumbPoint(StartBezierPoint),
-                new ThumbPoint(EndBezierPoint),
-                new ThumbPoint(EndPoint)
-            };
-            GetBezierApproximation();
-        }
+
         public BezierFigure()
         {
             Points = new PointCollection();
-            _extraControlPoints = new List<ThumbPoint>();
+            ControlPoints = new List<ThumbPoint>();
+            ControlPoints.Add(new ThumbPoint(10, 200));
+            ControlPoints.Add(new ThumbPoint(30, 40));
+            ControlPoints.Add(new ThumbPoint(300, 40));
+            ControlPoints.Add(new ThumbPoint(350, 250));
+            OrderControlPoints();
         }
         public override void OnApplyTemplate()
         {
@@ -139,30 +89,47 @@ namespace atpccl.Bezier
             {
                 _canvas = (Canvas)GetTemplateChild("PART_canvas");
                 _canvas.PreviewMouseLeftButtonDown += _canvas_MouseUp;
+                foreach (var item in OrderedControlPoints)
+                {
+                    item.DragDelta += Thumb_DragDelta;
+                    item.DragCompleted += Item_DragCompleted;
+                    _canvas.Children.Add(item);
+                }
             }
         }
 
-        void MergeControlPoints()
+        private void Item_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            ControlPoints = new List<ThumbPoint> {
-                    new ThumbPoint(StartPoint),
-                    new ThumbPoint(StartBezierPoint),
-                    new ThumbPoint(EndBezierPoint),
-                    new ThumbPoint(EndPoint)
-                };
-            foreach (var item in _extraControlPoints)
+            GetBezierApproximation();
+        }
+
+        void OrderControlPoints()
+        {
+            if (OrderedControlPoints == null)
             {
-                if (item.Point.X > ControlPoints.Last().Point.X)
+                OrderedControlPoints = new List<ThumbPoint>();
+            }
+            foreach (var item in ControlPoints)
+            {
+                if (OrderedControlPoints.Find(p => p.Id == item.Id) != null)
                 {
-                    ControlPoints.Add(item);
+                    continue;
+                }
+                if (OrderedControlPoints.Count == 0)
+                {
+                    OrderedControlPoints.Add(item);
+                }
+                else if (item.Point.X > OrderedControlPoints.Last().Point.X)
+                {
+                    OrderedControlPoints.Add(item);
                 }
                 else
                 {
-                    for (int i = 0; i < ControlPoints.Count; i++)
+                    for (int i = 0; i < OrderedControlPoints.Count; i++)
                     {
-                        if (item.Point.X < ControlPoints[i].Point.X)
+                        if (item.Point.X < OrderedControlPoints[i].Point.X)
                         {
-                            ControlPoints.Insert(i, item);
+                            OrderedControlPoints.Insert(i, item);
                             break;
                         }
                     }
@@ -176,15 +143,20 @@ namespace atpccl.Bezier
                 var point = e.GetPosition(_canvas);
                 var thumb = new ThumbPoint(point);
                 thumb.DragDelta += Thumb_DragDelta;
-                _extraControlPoints.Add(thumb);
+                thumb.DragCompleted += Item_DragCompleted;
+                ControlPoints.Add(thumb);
                 _canvas.Children.Add(thumb);
+                OrderControlPoints();
                 GetBezierApproximation();
             }
         }
 
         private void Thumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
         {
-            UpdateControlPoints();
+            if (OrderedControlPoints.Count < 10)
+            {
+                GetBezierApproximation();
+            }
         }
 
         static BezierFigure()
@@ -194,18 +166,17 @@ namespace atpccl.Bezier
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
-            UpdateControlPoints();
+            GetBezierApproximation();
         }
 
         void GetBezierApproximation()
         {
-            MergeControlPoints();
             int outputSegmentCount = 256;
             Point[] points = new Point[outputSegmentCount + 1];
             for (int i = 0; i <= outputSegmentCount; i++)
             {
                 double t = (double)i / outputSegmentCount;
-                points[i] = GetBezierPoint(t, ControlPoints, 0, ControlPoints.Count);
+                points[i] = GetBezierPoint(t, OrderedControlPoints, 0, OrderedControlPoints.Count);
             }
             PolyLine = new PolyLineSegment(points, true);
             Points = PolyLine.Points;

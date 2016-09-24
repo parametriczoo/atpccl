@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:atpccl"
+
     xmlns:local.Bezier="clr-namespace:atpccl.Bezier">
 
 
@@ -21,10 +21,7 @@
 
                         <Border DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="1">
                             
-                                <local.Bezier:BezierFigure StartPoint="{Binding StartPoint, RelativeSource={RelativeSource TemplatedParent}}"
-                                                           EndPoint="{Binding EndPoint, RelativeSource={RelativeSource TemplatedParent}}"
-                                                           StartBezierPoint="{Binding StartBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"
-                                                           EndBezierPoint="{Binding EndBezierPoint, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <local.Bezier:BezierFigure />
                             
                         </Border>
 
@@ -105,14 +102,7 @@
                                 </Path.Data>
                             </Path>
 
-                            <local.Bezier:ThumbPoint
-                                       Point="{Binding Path=StartPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
-                            <local.Bezier:ThumbPoint
-                                       Point="{Binding Path=StartBezierPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
-                            <local.Bezier:ThumbPoint
-                                       Point="{Binding Path=EndBezierPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
-                            <local.Bezier:ThumbPoint
-                                       Point="{Binding Path=EndPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        
                         </Canvas>
                     </Border>
                 </ControlTemplate>

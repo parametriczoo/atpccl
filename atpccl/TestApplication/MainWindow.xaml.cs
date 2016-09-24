@@ -38,10 +38,7 @@ namespace TestApplication
             DataContext = this;
             Bezier = new BezierFigure()
             {
-                StartPoint = new Point(10, 10),
-                EndPoint = new Point(100, 100),
-                StartBezierPoint = new Point(20, 20),
-                EndBezierPoint = new Point(200, 200)
+                
             };
         }
 
