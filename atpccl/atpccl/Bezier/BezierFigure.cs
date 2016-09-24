@@ -49,7 +49,8 @@ namespace atpccl.Bezier
     public class BezierFigure : Control
     {
         Canvas _canvas;
-        public PointCollection ControlPoints { get; set; }
+        public List<ThumbPoint> ControlPoints { get; set; }
+        List<ThumbPoint> _extraControlPoints { get; set; }
         public PointCollection Points
         {
             get { return (PointCollection)GetValue(PointsProperty); }
@@ -118,17 +119,18 @@ namespace atpccl.Bezier
         }
         public void UpdateControlPoints()
         {
-            ControlPoints = new PointCollection {
-                StartPoint,
-                StartBezierPoint,
-                EndBezierPoint,
-                EndPoint
+            ControlPoints = new List<ThumbPoint> {
+                new ThumbPoint(StartPoint),
+                new ThumbPoint(StartBezierPoint),
+                new ThumbPoint(EndBezierPoint),
+                new ThumbPoint(EndPoint)
             };
             GetBezierApproximation();
         }
         public BezierFigure()
         {
             Points = new PointCollection();
+            _extraControlPoints = new List<ThumbPoint>();
         }
         public override void OnApplyTemplate()
         {
@@ -140,20 +142,49 @@ namespace atpccl.Bezier
             }
         }
 
+        void MergeControlPoints()
+        {
+            ControlPoints = new List<ThumbPoint> {
+                    new ThumbPoint(StartPoint),
+                    new ThumbPoint(StartBezierPoint),
+                    new ThumbPoint(EndBezierPoint),
+                    new ThumbPoint(EndPoint)
+                };
+            foreach (var item in _extraControlPoints)
+            {
+                if (item.Point.X > ControlPoints.Last().Point.X)
+                {
+                    ControlPoints.Add(item);
+                }
+                else
+                {
+                    for (int i = 0; i < ControlPoints.Count; i++)
+                    {
+                        if (item.Point.X < ControlPoints[i].Point.X)
+                        {
+                            ControlPoints.Insert(i, item);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         private void _canvas_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
                 var point = e.GetPosition(_canvas);
-                ControlPoints = new PointCollection {
-                        StartPoint,
-                        StartBezierPoint,
-                        EndBezierPoint,
-                        EndPoint,
-                        point
-                    };
+                var thumb = new ThumbPoint(point);
+                thumb.DragDelta += Thumb_DragDelta;
+                _extraControlPoints.Add(thumb);
+                _canvas.Children.Add(thumb);
                 GetBezierApproximation();
             }
+        }
+
+        private void Thumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+        {
+            UpdateControlPoints();
         }
 
         static BezierFigure()
@@ -164,11 +195,11 @@ namespace atpccl.Bezier
         {
             base.OnInitialized(e);
             UpdateControlPoints();
-            GetBezierApproximation();
         }
 
         void GetBezierApproximation()
         {
+            MergeControlPoints();
             int outputSegmentCount = 256;
             Point[] points = new Point[outputSegmentCount + 1];
             for (int i = 0; i <= outputSegmentCount; i++)
@@ -180,10 +211,10 @@ namespace atpccl.Bezier
             Points = PolyLine.Points;
         }
 
-        Point GetBezierPoint(double t, PointCollection controlPoints, int index, int count)
+        Point GetBezierPoint(double t, List<ThumbPoint> controlPoints, int index, int count)
         {
             if (count == 1)
-                return controlPoints[index];
+                return controlPoints[index].Point;
             var P0 = GetBezierPoint(t, controlPoints, index, count - 1);
             var P1 = GetBezierPoint(t, controlPoints, index + 1, count - 1);
             return new Point((1 - t) * P0.X + t * P1.X, (1 - t) * P0.Y + t * P1.Y);

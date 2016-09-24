@@ -57,6 +57,7 @@ namespace atpccl.Bezier
         public static readonly DependencyProperty PointProperty =
             DependencyProperty.Register("Point", typeof(Point), typeof(ThumbPoint), new FrameworkPropertyMetadata(new Point()));
 
+        public Guid Id { get; private set; }
 
         static ThumbPoint()
         {
@@ -65,6 +66,11 @@ namespace atpccl.Bezier
         public ThumbPoint()
         {
             this.DragDelta += new DragDeltaEventHandler(this.OnDragDelta);
+            Id = Guid.NewGuid();
+        }
+        public ThumbPoint(Point point) : this()
+        {
+            Point = point;
         }
 
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
